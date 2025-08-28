@@ -4,15 +4,20 @@ import os
 import subprocess
 from tests.test_cases import TESTS, MAX_SCORE
 
-REPORT_DIR = 'reports'
+REPORT_DIR = 'tests/reports'
 os.makedirs(REPORT_DIR, exist_ok=True)
 
-submissions = sorted(glob.glob('submissions/*.py'))
+submissions = sorted(glob.glob('./submissions/*.py'))
+# print("Found submissions:", submissions)
 
 rows = []
 
 for sub in submissions:
-    student_id = os.path.basename(sub).replace('.py', '')
+    student_id = os.path.basename(sub).replace('.py', '').lower()
+    if not student_id.startswith('s'):
+        # print(f"Skipping non-student file: {sub}")
+        continue
+    print(f"Grading submission: {student_id}")
     report = {
         'student_id': student_id,
         'submission': sub,
@@ -24,7 +29,7 @@ for sub in submissions:
     for idx, t in enumerate(TESTS):
         try:
             completed = subprocess.run(
-                ['python3', 'tests/exec_test.py', '--submission', sub, '--test-index', str(idx)],
+                ['python', './tests/exec_test.py', '--submission', sub, '--test-index', str(idx)],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 timeout=8,
@@ -49,10 +54,10 @@ for sub in submissions:
                     'error_reason': 'Execution failed',
                     'output': None,
                     'time_ms': None,
-                    'exception': completed.stderr
+                    'exception': completed.stderr,
+                    'test_name': t['name'],
+                    'points': t['points']
                 }
-                res['test_name'] = t['name']
-                res['points'] = t['points']
             else:
                 try:
                     res = json.loads(completed.stdout)
@@ -62,10 +67,10 @@ for sub in submissions:
                         'error_reason': 'Malformed runner output',
                         'output': completed.stdout,
                         'time_ms': None,
-                        'exception': completed.stderr
+                        'exception': completed.stderr,
+                        'test_name': t['name'],
+                        'points': t['points']
                     }
-                    res['test_name'] = t['name']
-                    res['points'] = t['points']
 
         # scoring
         if res.get('passed'):
@@ -97,7 +102,7 @@ for sub in submissions:
 # write CSV
 import csv
 
-with open('results.csv', 'w', newline='', encoding='utf-8') as csvfile:
+with open('tests/results.csv', 'w', newline='', encoding='utf-8') as csvfile:
     fieldnames = ['student_id', 'total_score', 'max_score', 'passed_tests', 'failed_tests', 'report_path']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
