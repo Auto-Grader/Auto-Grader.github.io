@@ -394,7 +394,7 @@ if __name__ == '__main__':
 ### `tests/grade_all.py` (aggregates all tests across all submissions)
 
 ```python
-# tests/grade_all.py
+# tests/grader.py
 
 import glob
 import json

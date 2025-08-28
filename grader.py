@@ -4,7 +4,8 @@ import os
 import subprocess
 from tests.test_cases import TESTS, MAX_SCORE
 
-REPORT_DIR = 'tests/reports'
+REPORT_DIR = './reports'
+RESULTS_FILE = './results.csv'
 os.makedirs(REPORT_DIR, exist_ok=True)
 
 submissions = sorted(glob.glob('./submissions/*.py'))
@@ -102,7 +103,7 @@ for sub in submissions:
 # write CSV
 import csv
 
-with open('tests/results.csv', 'w', newline='', encoding='utf-8') as csvfile:
+with open(RESULTS_FILE, 'w', newline='', encoding='utf-8') as csvfile:
     fieldnames = ['student_id', 'total_score', 'max_score', 'passed_tests', 'failed_tests', 'report_path']
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
     writer.writeheader()
