@@ -1,0 +1,11 @@
+def bubble_sort(arr):
+    """
+    Sort `arr` in-place using bubble sort algorithm. This function may either:
+      - modify `arr` in place and return `None`, OR
+      - return a sorted list (in which case the harness will check the return value).
+
+    The harness will test correctness by comparing to Python's sorted() result.
+    """
+    
+    # TODO: Implement bubble sort algorithm
+    ...

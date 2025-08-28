@@ -1,0 +1,47 @@
+name: Auto-grade Submissions
+
+on:
+  push:
+    paths:
+      - 'submissions/**'
+      - 'tests/**'
+  workflow_dispatch: { }
+
+jobs:
+  grade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          # no extra deps for this example
+
+      - name: Run grader
+        run: |
+          python3 tests/grade_all.py
+
+      - name: Upload reports artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: grading-reports
+          path: |
+            reports/
+            results.csv
+
+      # Optional: commit results.csv back to repository (uncomment if you want to persist)
+      - name: Commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: 'Auto-commit grading results'
+          file_pattern: 'results.csv'
+          branch: 'main'
+          # The default GITHUB_TOKEN is used by this action to push
